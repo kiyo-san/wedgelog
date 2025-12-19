@@ -2,6 +2,36 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+## Neon Postgres (DATABASE_URL)
+
+This repo uses **Prisma** with the standard `DATABASE_URL` environment variable (see `prisma/schema.prisma`).
+
+- **Create a Neon project**: In the Neon console, create a project + database (or use an existing one).
+- **Copy a connection string**: Neon Console → your project → **Connection string**.
+  - **Recommended for Prisma migrations**: use **Direct connection** (non-pooled).
+  - **Often best for serverless runtime**: use **Pooled connection**.
+- **Set `DATABASE_URL` locally** (example format):
+
+```bash
+export DATABASE_URL='postgresql://USER:PASSWORD@HOST:5432/DB?sslmode=require'
+```
+
+- **Generate Prisma Client**:
+
+```bash
+npx prisma generate
+```
+
+- **Create/update the database schema**:
+
+```bash
+# quick prototyping (no migrations)
+npx prisma db push
+
+# or, for proper migrations
+npx prisma migrate dev
+```
+
 First, run the development server:
 
 ```bash
