@@ -33,7 +33,7 @@ jobs:
           fi
 
       - name: Run tests
-        run: npm test
+        run: npm run test
 
       - name: Build
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
