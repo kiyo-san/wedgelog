@@ -38,7 +38,7 @@ export async function GET() {
 
 
 export async function PATCH(request: Request) {
-  const data: { id: UUID, name: string, email: string } = await request.json();
+  const data: { id: number, name: string, email: string } = await request.json();
   const user = await prisma.users.findUnique({
     where: { id: data.id },
   });
