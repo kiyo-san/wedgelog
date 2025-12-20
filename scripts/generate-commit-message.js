@@ -69,6 +69,42 @@ function stageAllFiles() {
   }
 }
 
+function commitChanges(message) {
+  try {
+    // Use -F to read from stdin or create temp file for multi-line messages
+    if (message.includes('\n')) {
+      const msgFile = path.join(process.cwd(), '.git-commit-msg.txt');
+      fs.writeFileSync(msgFile, message);
+      execSync(`git commit -F ${msgFile}`, { encoding: 'utf-8', stdio: 'inherit' });
+      // Clean up temp file
+      try {
+        fs.unlinkSync(msgFile);
+      } catch (e) {
+        // Ignore cleanup errors
+      }
+    } else {
+      execSync(`git commit -m "${message.replace(/"/g, '\\"')}"`, { encoding: 'utf-8', stdio: 'inherit' });
+    }
+    return true;
+  } catch (error) {
+    console.error('Error committing changes:', error.message);
+    return false;
+  }
+}
+
+function pushChanges() {
+  try {
+    // Get current branch name
+    const branch = execSync('git rev-parse --abbrev-ref HEAD', { encoding: 'utf-8' }).trim();
+    console.log(`\n🚀 Pushing to origin/${branch}...\n`);
+    execSync(`git push origin ${branch}`, { encoding: 'utf-8', stdio: 'inherit' });
+    return true;
+  } catch (error) {
+    console.error('Error pushing changes:', error.message);
+    return false;
+  }
+}
+
 function analyzeChanges(files, diff) {
   const changes = {
     added: [],
@@ -195,17 +231,7 @@ function generateCommitMessage(changes) {
 }
 
 function main() {
-  // Check for untracked files and stage them
-  const untrackedFiles = getUntrackedFiles();
-  if (untrackedFiles.length > 0) {
-    console.log(`\n📦 Found ${untrackedFiles.length} untracked file(s). Staging them...\n`);
-    if (stageAllFiles()) {
-      console.log('✓ All files staged successfully.\n');
-    } else {
-      console.log('⚠ Failed to stage some files. Continuing anyway...\n');
-    }
-  }
-
+  // Stage all changes (untracked, unstaged, and already staged)
   const status = getGitStatus();
   
   if (!status) {
@@ -213,31 +239,45 @@ function main() {
     process.exit(0);
   }
 
-  // Get files after staging (untracked files are now staged)
+  // Stage all files to ensure everything is committed
+  console.log('\n📦 Staging all changes...\n');
+  if (!stageAllFiles()) {
+    console.error('⚠ Failed to stage files. Aborting.');
+    process.exit(1);
+  }
+  console.log('✓ All files staged successfully.\n');
+
+  // Get all staged files after staging
   const stagedFiles = getStagedFiles();
-  const unstagedFiles = getUnstagedFiles();
-  const allFiles = [...new Set([...stagedFiles, ...unstagedFiles])];
   
-  if (allFiles.length === 0) {
-    console.log('No changed files detected.');
+  if (stagedFiles.length === 0) {
+    console.log('No staged files detected.');
     process.exit(0);
   }
 
+  // Get diff for analysis
   const diff = getGitDiff();
-  const changes = analyzeChanges(allFiles, diff);
+  const changes = analyzeChanges(stagedFiles, diff);
   const commitMessage = generateCommitMessage(changes);
 
   console.log('\n📝 Generated commit message:\n');
   console.log(commitMessage);
-  console.log('\n---\n');
-  console.log('To use this message, run:');
-  console.log(`  git commit -m "${commitMessage.split('\n')[0]}"`);
-  if (commitMessage.includes('\n')) {
-    console.log('\nOr save it to a file and use:');
-    const msgFile = path.join(process.cwd(), '.git-commit-msg.txt');
-    fs.writeFileSync(msgFile, commitMessage);
-    console.log(`  git commit -F ${msgFile}`);
+  console.log('\n');
+
+  // Commit the changes
+  console.log('💾 Committing changes...\n');
+  if (!commitChanges(commitMessage)) {
+    console.error('⚠ Failed to commit changes. Aborting.');
+    process.exit(1);
   }
+  console.log('✓ Changes committed successfully.\n');
+
+  // Push the changes
+  if (!pushChanges()) {
+    console.error('⚠ Failed to push changes.');
+    process.exit(1);
+  }
+  console.log('✓ Changes pushed successfully.\n');
 }
 
 main();

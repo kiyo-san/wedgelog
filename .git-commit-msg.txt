@@ -1,6 +1,8 @@
-fix: update .git-commit-msg.txt
+feat(database): update .git-commit-msg.txt
 
 Changes:
   ~ .git-commit-msg.txt
+  ~ .github/workflows/deploy_vercel.yml
+  ~ app/lib/prisma.ts
+  ~ package-lock.json
   ~ package.json
-  ~ scripts/generate-commit-message.js

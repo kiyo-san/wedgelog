@@ -1,5 +1,5 @@
 
-import { PrismaClient } from "@prisma/client";
+import PrismaClient from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 
@@ -8,7 +8,7 @@ const prismaUrl =
 
 declare global {
   // eslint-disable-next-line no-var
-  var prisma: PrismaClient | undefined;
+  var prisma: typeof PrismaClient | undefined;
 }
 
 function makePrismaClient() {
@@ -22,7 +22,7 @@ function makePrismaClient() {
   const adapter = new PrismaPg(pool);
 
   // Prisma 7 requires an adapter (direct DB) or accelerateUrl.
-  return new PrismaClient({ adapter });
+  return new (PrismaClient as any)({ adapter });
 }
 
 export const prisma =
