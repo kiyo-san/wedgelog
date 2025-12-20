@@ -3,8 +3,14 @@
 import Image from "next/image";
 import { use, useEffect, useState} from "react";
 
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
 export default function Home() {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<User[]>([]);
   const fetchUsers = async () => {
     const response = await fetch('/api/users', {
       method: 'GET',
@@ -13,12 +19,16 @@ export default function Home() {
   };
   
   
-  const onFieldChange = async (id, el, value) => {
-    const obj = {
+  const onFieldChange = async (id: number, el: string, value: string) => {
+    const obj: { id: number, name?: string, email?: string } = {
       id,
     };
 
-    obj[el] = value;
+    if (el === 'name') {
+      obj.name = value;
+    } else if (el === 'email') {
+      obj.email = value;
+    }
 
     const response = await fetch('/api/users', {
       method: 'PATCH',
@@ -35,13 +45,13 @@ export default function Home() {
   }, []);
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      {users.map((user) => {
+      {users.map((user:User) => {
         return (
           <div key={user.id}>
-            <input type="text" defaultValue={user.name} onBlur={() => {
+            <input type="text" defaultValue={user.name} onBlur={(event) => {
               onFieldChange(user.id, 'name', event.target.value)
             }} />
-            <input type="text" defaultValue={user.email} onBlur={() => {
+            <input type="text" defaultValue={user.email} onBlur={(event) => {
               onFieldChange(user.id, 'email', event.target.value)
             }} />
             {/* <p>{user.useState}</p> */}
