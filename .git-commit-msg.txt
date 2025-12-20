@@ -1,0 +1,6 @@
+fix: update .git-commit-msg.txt
+
+Changes:
+  ~ .git-commit-msg.txt
+  ~ package.json
+  ~ scripts/generate-commit-message.js

@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "jest"
+    "test": "jest",
+    "git": "node scripts/generate-commit-message.js"
   },
   "dependencies": {
     "@prisma/client": "^7.1.0",
