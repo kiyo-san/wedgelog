@@ -3,12 +3,19 @@
 import "dotenv/config";
 import { defineConfig, env } from "prisma/config";
 
+// For prisma generate, we don't need a real connection string
+// Use a dummy value if not available (generate doesn't connect to DB)
+const connectionString = 
+  process.env.NEON_CONNECTION_STRING || 
+  process.env.DATABASE_URL || 
+  "postgresql://dummy:dummy@localhost:5432/dummy";
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
   },
   datasource: {
-    url: env("NEON_CONNECTION_STRING"),
+    url: connectionString,
   },
 });
