@@ -40,18 +40,8 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   const data: { id: number, name: string, email: string } = await request.json();
-  const user = await prisma.users.findUnique({
-    where: { id: data.id },
-  });
 
-  if (!user) {
-    return NextResponse.json(
-      { ok: false, error: 'User not found' },
-      { status: 404 }
-    );
-  }
-
-  await prisma.users.update({
+  const updatedUser = await prisma.users.update({
     where: { id: data.id },
     data: {
       name: data.name,
@@ -59,9 +49,7 @@ export async function PATCH(request: Request) {
     },
   });
  
-  const updatedUser = await prisma.users.findUnique({
-    where: { id: data.id },
-  });
+ 
   return NextResponse.json({ ok: true, data: 'YES', user: updatedUser });
 }
 
