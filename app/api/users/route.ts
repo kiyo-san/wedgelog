@@ -19,7 +19,7 @@ export async function GET() {
     }
 
     // This forces a real round-trip to the DB by hitting a known Prisma model/table.
-    const users = await prisma.users.findMany();
+    const users = await prisma?.users?.findMany();
     
     return NextResponse.json({
       ok: true,
