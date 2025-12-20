@@ -1,4 +1,5 @@
-export const runtime = "nodejs";
+export const runtime = "nodejs";           // avoid edge unless you mean it
+export const preferredRegion = ["syd1"]; 
 
 import { NextResponse } from "next/server";
 
